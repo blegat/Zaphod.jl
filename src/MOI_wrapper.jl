@@ -96,16 +96,19 @@ MOI.get(::Optimizer, ::MOI.SolverVersion) = "v0.0.1"
 # MOI.RawOptimizerAttribute
 
 function MOI.supports(::Optimizer, param::MOI.RawOptimizerAttribute)
-    return hasfield(settings, Symbol(param.name))
+    return haskey(settings, Symbol(param.name))
 end
 
 function MOI.set(optimizer::Optimizer, param::MOI.RawOptimizerAttribute, value)
+    if !MOI.supports(optimizer, param)
+        throw(MOI.UnsupportedAttribute(param))
+    end
     optimizer.options[param.name] = value
     return
 end
 
 function MOI.get(optimizer::Optimizer, param::MOI.RawOptimizerAttribute)
-    if !haskey(optimizer.options, param.name)
+    if !MOI.supports(optimizer, param)
         throw(MOI.UnsupportedAttribute(param))
     end
     return optimizer.options[param.name]
