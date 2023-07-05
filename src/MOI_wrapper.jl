@@ -291,13 +291,8 @@ function MOI.copy_to(dest::Optimizer{T}, src::OptimizerCache{T}) where {T}
     end
     dest.cones = deepcopy(src.constraints.sets)
     D = LinearAlgebra.Diagonal(_set_dot_scaling(T, size(A, 1), dest.cones))
-    dest.data = Data(
-        A,
-        A' * D,
-        Ab.constants,
-        Ab.constants,
-        dest.max_sense ? -c0 : c0,
-    )
+    dest.data =
+        Data(A, A' * D, Ab.constants, Ab.constants, dest.max_sense ? -c0 : c0)
     dest.sol, dest.cache = setup(dest.data)
     return MOI.Utilities.identity_index_map(src)
 end
