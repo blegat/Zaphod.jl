@@ -28,13 +28,10 @@ function test_runtests()
     MOI.Test.runtests(
         model,
         config,
-        include = String[
-            "test_conic_PositiveSemidefiniteConeTriangle_VectorAffineFunction",
-        ]
-        # exclude = String[
-        #     "test_model_LowerBoundAlreadySet",
-        #     "test_model_UpperBoundAlreadySet",
-        # ]
+        exclude = String[
+            "test_model_LowerBoundAlreadySet",
+            "test_model_UpperBoundAlreadySet",
+        ],
     )
     return
 end

@@ -1,4 +1,7 @@
-include("scaled_psd_cone_bridge.jl")
+# We need the code to have an unscaled `MOI.Utilities.set_dot`.
+# So with `MOI.PositiveSemidefiniteConeTriangle`, the dual does not have `A'`,
+# we would need some scaling in addition # to just transposing `A`.
+# With `MOI.ScaledPositiveSemidefiniteConeTriangle`, we can just transpose.
 
 const SUPPORTED_CONES = Union{
     MOI.Zeros,
@@ -8,7 +11,6 @@ const SUPPORTED_CONES = Union{
     MOI.DualExponentialCone,
     MOI.PowerCone,
     MOI.DualPowerCone,
-    ScaledPSDCone,
 }
 
 MOI.Utilities.@product_of_sets(
@@ -20,7 +22,6 @@ MOI.Utilities.@product_of_sets(
     MOI.DualExponentialCone,
     MOI.PowerCone,
     MOI.DualPowerCone,
-    ScaledPSDCone,
 )
 
 const OptimizerCache{T} = MOI.Utilities.GenericModel{
@@ -51,7 +52,7 @@ const DEFAULT_OPTIONS = Dict{String,Any}(
 """
     Optimizer()
 
-Create a new ECOS optimizer.
+Create a new SimpleConicADMM optimizer.
 """
 mutable struct Optimizer{T} <: MOI.AbstractOptimizer
     cones::Union{Nothing,Cones{T}}
@@ -63,18 +64,23 @@ mutable struct Optimizer{T} <: MOI.AbstractOptimizer
     silent::Bool
     options::Dict{String,Any}
 
-    function Optimizer{T}() where T
-        return new{T}(nothing, nothing, nothing, nothing, false, zero(T), false, copy(DEFAULT_OPTIONS))
+    function Optimizer{T}() where {T}
+        return new{T}(
+            nothing,
+            nothing,
+            nothing,
+            nothing,
+            false,
+            zero(T),
+            false,
+            copy(DEFAULT_OPTIONS),
+        )
     end
 end
 Optimizer() = Optimizer{Float64}()
 
 function MOI.default_cache(::Optimizer{T}, ::Type{T}) where {T}
     return MOI.Utilities.UniversalFallback(OptimizerCache{T}())
-end
-
-function MOI.get(::Optimizer{T}, ::MOI.Bridges.ListOfNonstandardBridges) where {T}
-    return [ScaledPSDConeBridge{T}]
 end
 
 function MOI.is_empty(optimizer::Optimizer)
@@ -91,12 +97,12 @@ end
 
 MOI.get(::Optimizer, ::MOI.SolverName) = "SimpleConicADMM"
 
-MOI.get(::Optimizer, ::MOI.SolverVersion) = "v0.0.1"
+MOI.get(::Optimizer, ::MOI.SolverVersion) = "v0.1.0"
 
 # MOI.RawOptimizerAttribute
 
 function MOI.supports(::Optimizer, param::MOI.RawOptimizerAttribute)
-    return haskey(settings, Symbol(param.name))
+    return haskey(DEFAULT_OPTIONS, param.name)
 end
 
 function MOI.set(optimizer::Optimizer, param::MOI.RawOptimizerAttribute, value)
@@ -133,7 +139,7 @@ function MOI.supports(
         MOI.ObjectiveSense,
         MOI.ObjectiveFunction{MOI.ScalarAffineFunction{T}},
     },
-) where T
+) where {T}
     return true
 end
 
@@ -141,11 +147,11 @@ function MOI.supports_constraint(
     ::Optimizer{T},
     ::Type{MOI.VectorAffineFunction{T}},
     ::Type{<:SUPPORTED_CONES},
-) where T
+) where {T}
     return true
 end
 
-function MOI.optimize!(optimizer::Optimizer{T}) where T
+function MOI.optimize!(optimizer::Optimizer{T}) where {T}
     data = optimizer.data
     sol = optimizer.sol
     options = optimizer.options
@@ -170,7 +176,15 @@ function MOI.optimize!(optimizer::Optimizer{T}) where T
         g = cx + by
         rel_gap = abs(g) / (1 + abs(cx) + abs(by))
         if !optimizer.silent
-            print_info(i, primal_feasibility, cx, dual_feasibility, by, rel_gap, start)
+            print_info(
+                i,
+                primal_feasibility,
+                cx,
+                dual_feasibility,
+                by,
+                rel_gap,
+                start,
+            )
         end
         if primal_feasible && dual_feasible && rel_gap ≤ options["ϵ_gap"]
             sol.raw_status = "Solved to optimality"
@@ -206,11 +220,18 @@ function MOI.optimize!(optimizer::Optimizer{T}) where T
         if i >= max_iters
             break
         end
-        iterate!(sol, optimizer.data, optimizer.cache, optimizer.cones, size(data.A, 2))
+        iterate!(
+            sol,
+            optimizer.data,
+            optimizer.cache,
+            optimizer.cones,
+            size(data.A, 2),
+        )
     end
     sol.raw_status = "Maximum number of iterations ($max_iters) reached"
     sol.termination_status = MOI.ITERATION_LIMIT
-    sol.primal_status = primal_feasible ? MOI.FEASIBLE_POINT : MOI.INFEASIBLE_POINT
+    sol.primal_status =
+        primal_feasible ? MOI.FEASIBLE_POINT : MOI.INFEASIBLE_POINT
     sol.dual_status = dual_feasible ? MOI.FEASIBLE_POINT : MOI.INFEASIBLE_POINT
     return
 end
@@ -227,11 +248,7 @@ function MOI.copy_to(dest::Optimizer{T}, src::OptimizerCache{T}) where {T}
         c0[term.variable.value] += term.coefficient
     end
     dest.cones = deepcopy(src.constraints.sets)
-    dest.data = Data(
-        A,
-        Ab.constants,
-        dest.max_sense ? -c0 : c0,
-    )
+    dest.data = Data(A, Ab.constants, dest.max_sense ? -c0 : c0)
     dest.sol, dest.cache = setup(dest.data)
     return MOI.Utilities.identity_index_map(src)
 end
@@ -267,7 +284,8 @@ end
 
 # Implements getter for result value and statuses
 function MOI.get(optimizer::Optimizer, ::MOI.TerminationStatus)
-    return isnothing(optimizer.sol) ? MOI.OPTIMIZE_NOT_CALLED : optimizer.sol.termination_status
+    return isnothing(optimizer.sol) ? MOI.OPTIMIZE_NOT_CALLED :
+           optimizer.sol.termination_status
 end
 
 function MOI.get(optimizer::Optimizer, attr::MOI.ObjectiveValue)
@@ -321,7 +339,10 @@ function MOI.get(
     ci::MOI.ConstraintIndex,
 )
     MOI.check_result_index_bounds(optimizer, attr)
-    return slack(optimizer.sol, length(optimizer.data.c))[MOI.Utilities.rows(optimizer.cones, ci)]
+    return slack(optimizer.sol, length(optimizer.data.c))[MOI.Utilities.rows(
+        optimizer.cones,
+        ci,
+    )]
 end
 
 function MOI.get(optimizer::Optimizer, attr::MOI.DualStatus)

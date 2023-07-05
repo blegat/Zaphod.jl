@@ -2,8 +2,7 @@ module SimpleConicADMM
 
 using LinearAlgebra, SparseArrays
 
-import MathOptInterface
-const MOI = MathOptInterface
+import MathOptInterface as MOI
 
 # Uncomment only one of the four following lines
 include("solver.jl")
