@@ -4,7 +4,6 @@ struct Data{T}
     c::Vector{T}
 end
 
-
 const RAW_OPTIMIZE_NOT_CALLED = "Optimize not called"
 mutable struct Solution{T}
     uxy::Vector{T}
@@ -17,7 +16,7 @@ mutable struct Solution{T}
     dual_status::MOI.ResultStatusCode
     solve_time::Float64
     iter::Int
-    function Solution{T}(k) where T
+    function Solution{T}(k) where {T}
         return new{T}(
             zeros(T, k),
             one(T),
@@ -41,14 +40,14 @@ function primal(sol::Solution, n)
 end
 
 function unscaled_dual(sol::Solution, n)
-    return view(sol.uxy, (n + 1):length(sol.uxy))
+    return view(sol.uxy, (n+1):length(sol.uxy))
 end
 function dual(sol::Solution, n)
     return unscaled_dual(sol, n) / sol.uτ
 end
 
 function unscaled_slack(sol::Solution, n)
-    return view(sol.vrs, (n + 1):length(sol.vrs))
+    return view(sol.vrs, (n+1):length(sol.vrs))
 end
 function slack(sol::Solution, n)
     return unscaled_slack(sol, n) / sol.uτ
@@ -76,12 +75,7 @@ function setup(data::Data{T}) where {T}
     IMh = _lin_solve(F, h, n)
     deno = 1 + dot(h, IMh)
     solution = Solution{T}(n + m)
-    cache = Cache{T}(
-        F,
-        h,
-        IMh,
-        deno,
-    )
+    cache = Cache{T}(F, h, IMh, deno)
     return solution, cache
 end
 
@@ -114,9 +108,9 @@ function _project_cones(cones, u, w, cis, n)
         cone = _set(cones, ci)
         dual = MOI.dual_set(cone)
         rows = MOI.Utilities.rows(cones, ci)
-        u[n .+ rows] = MathOptSetDistances.projection_on_set(
+        u[n.+rows] = MathOptSetDistances.projection_on_set(
             MathOptSetDistances.DefaultDistance(),
-            w[n .+ rows],
+            w[n.+rows],
             dual,
         )
     end
@@ -143,11 +137,21 @@ end
 using Printf
 
 # print objective gap information for iterative
-function print_info(i, primal_feasibility, cx, dual_feasibility, by, rel_gap, start)
+function print_info(
+    i,
+    primal_feasibility,
+    cx,
+    dual_feasibility,
+    by,
+    rel_gap,
+    start,
+)
     if iszero(i)
         @printf "\n%-5s | %-14s | %-14s | %-14s | %-14s | %-11s | %-11s\n" "Iter." "Primal Feas." "Primal Obj." "Dual Feas." "Dual Obj." "Rel. gap" "Time (s)"
     end
-    @printf "%5d | %+14.6e | %+14.6e | %+14.6e | %+14.6e | %11.3e | %11.3e\n" i primal_feasibility cx dual_feasibility -by rel_gap (time() - start)
+    @printf "%5d | %+14.6e | %+14.6e | %+14.6e | %+14.6e | %11.3e | %11.3e\n" i primal_feasibility cx dual_feasibility -by rel_gap (
+        time() - start
+    )
     flush(stdout)
     flush(stderr)
     return
