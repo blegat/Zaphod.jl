@@ -16,7 +16,7 @@ One important difference is that SimpleConicADMM uses [MathOptSetDistances](http
 Therefore, any `MOI.AbstractVectorSet` that satisfies the following 5 conditions is automatically supported:
 * `MOI.dual_set` is implemented
 * `MathOptSetDistances.projection_on_set` is implemented
-* `MOI.Utilities.set_dot` is equivalent to `LinearAlgebra.dot` (we could work around this similarly to how [Dualization](https://github.com/jump-dev/Dualization.jl) does it but we want to keep the code simple)
+* `MOI.Utilities.set_dot` is equivalent to `LinearAlgebra.dot` (we could work around this similarly to how [Dualization](https://github.com/jump-dev/Dualization.jl) to scale `A'` and `b'` of the `Q` matrix equation (8) of the [SCS paper](https://web.stanford.edu/~boyd/papers/scs.html) but for the program to remain self-dual we would actually need to scale both `A'` and `A` by the square root of the scaling so it's equivalent to bridging to the scaled version of the cones, see https://github.com/blegat/SimpleConicADMM.jl/pull/2)
 * The set is included in the `SUPPORTED_CONE` `Union` in `src/MOI_wrapper.jl`
 * The set is included in the `Cones` `@product_of_sets` in `src/MOI_wrapper.jl`
 
