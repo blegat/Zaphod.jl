@@ -12,4 +12,5 @@ SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 SuiteSparse = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
 
 [compat]
+MathOptSetDistances = "0.2"
 MathOptInterface = "1"
