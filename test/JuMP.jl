@@ -1,8 +1,8 @@
 using JuMP
-import SimpleConicADMM
+import Zaphod
 
 function test_SOC()
-    model = Model(SimpleConicADMM.Optimizer)
+    model = Model(Zaphod.Optimizer)
     set_optimizer_attributes(
         model,
         "ϵ_primal" => 1e-5,

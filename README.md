@@ -1,22 +1,24 @@
-# SimpleConicADMM.jl
+# Zaphod.jl
 
-[![Build Status](https://github.com/blegat/SimpleConicADMM.jl/workflows/CI/badge.svg?branch=master)](https://github.com/blegat/SimpleConicADMM.jl/actions?query=workflow%3ACI)
-[![codecov](https://codecov.io/gh/blegat/SimpleConicADMM.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/blegat/SimpleConicADMM.jl)
+[![Build Status](https://github.com/blegat/Zaphod.jl/workflows/CI/badge.svg?branch=master)](https://github.com/blegat/Zaphod.jl/actions?query=workflow%3ACI)
+[![codecov](https://codecov.io/gh/blegat/Zaphod.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/blegat/Zaphod.jl)
 
-[SimpleConicADMM.jl](https://github.com/blegat/SimpleConicADMM.jl) is a simple implementation of an ADMM solver
+[Zaphod.jl](https://github.com/blegat/Zaphod.jl) (**Z**aphod is an  **A**DMM/**P**roximal solver for the **Ho**mogeneous Self-**D**ual Embedding) is a simple implementation of an ADMM solver
 for conic programs interfacing with [MathOptInterface (MOI)](https://github.com/jump-dev/MathOptInterface.jl).
+
+Much like Zaphod Beeblebrox, its plan is to remain stupidely simple (following the KISS principle) and let its dependencies do all the work.
 
 It is not meant to be the most efficient but rather to be a good example for learning how to write a solver
 for [JuMP](https://github.com/jump-dev/JuMP.jl).
 
 The implementation follows quite closely what's described in [SCS paper](https://web.stanford.edu/~boyd/papers/scs.html).
 
-The solver is quite similar to SCS and COSMO although SCS and COSMO should be much faster and they also support quadratic objective.
-One important difference is that SimpleConicADMM uses [MathOptSetDistances](https://github.com/matbesancon/MathOptSetDistances.jl).
+The solver is quite similar to SCS and COSMO although SCS and COSMO should be much faster (as their goal is to be fast, not only simple) and they also support quadratic objective.
+One important difference is that Zaphod uses [MathOptSetDistances](https://github.com/matbesancon/MathOptSetDistances.jl).
 Therefore, any `MOI.AbstractVectorSet` that satisfies the following 5 conditions is automatically supported:
 * `MOI.dual_set` is implemented
 * `MathOptSetDistances.projection_on_set` is implemented
-* `MOI.Utilities.set_dot` is equivalent to `LinearAlgebra.dot` (we could work around this similarly to how [Dualization](https://github.com/jump-dev/Dualization.jl) to scale `A'` and `b'` of the `Q` matrix equation (8) of the [SCS paper](https://web.stanford.edu/~boyd/papers/scs.html) but for the program to remain self-dual we would actually need to scale both `A'` and `A` by the square root of the scaling so it's equivalent to bridging to the scaled version of the cones, see https://github.com/blegat/SimpleConicADMM.jl/pull/2)
+* `MOI.Utilities.set_dot` is equivalent to `LinearAlgebra.dot` (we could work around this similarly to how [Dualization](https://github.com/jump-dev/Dualization.jl) to scale `A'` and `b'` of the `Q` matrix equation (8) of the [SCS paper](https://web.stanford.edu/~boyd/papers/scs.html) but for the program to remain self-dual we would actually need to scale both `A'` and `A` by the square root of the scaling so it's equivalent to bridging to the scaled version of the cones, see https://github.com/blegat/Zaphod.jl/pull/2)
 * The set is included in the `SUPPORTED_CONE` `Union` in `src/MOI_wrapper.jl`
 * The set is included in the `Cones` `@product_of_sets` in `src/MOI_wrapper.jl`
 
@@ -26,29 +28,29 @@ This was used for
 
 ## License
 
-`SimpleConicADMM.jl` is licensed under the [MIT License](https://github.com/blegat/SimpleConicADMM.jl/blob/master/LICENSE.md).
+`Zaphod.jl` is licensed under the [MIT License](https://github.com/blegat/Zaphod.jl/blob/master/LICENSE.md).
 
 ## Installation
 
-Install SimpleConicADMM as follows:
+Install Zaphod as follows:
 ```julia
 import Pkg
-Pkg.add(url="https://github.com/blegat/SimpleConicADMM.jl")
+Pkg.add(url="https://github.com/blegat/Zaphod.jl")
 ```
 
 ## Use with JuMP
 
-To use SimpleConicADMM with JuMP, use `SimpleConicADMM.Optimizer`:
+To use Zaphod with JuMP, use `Zaphod.Optimizer`:
 
 ```julia
-using JuMP, SimpleConicADMM
-model = Model(SimpleConicADMM.Optimizer)
+using JuMP, Zaphod
+model = Model(Zaphod.Optimizer)
 set_attribute(model, "max_iters", 600)
 ```
 
 ## MathOptInterface API
 
-The SimpleConicADMM optimizer supports the following constraints and attributes.
+The Zaphod optimizer supports the following constraints and attributes.
 
 List of supported objective functions:
 

@@ -52,7 +52,7 @@ const DEFAULT_OPTIONS = Dict{String,Any}(
 """
     Optimizer()
 
-Create a new SimpleConicADMM optimizer.
+Create a new Zaphod optimizer.
 """
 mutable struct Optimizer{T} <: MOI.AbstractOptimizer
     cones::Union{Nothing,Cones{T}}
@@ -95,7 +95,7 @@ function MOI.empty!(optimizer::Optimizer)
     return
 end
 
-MOI.get(::Optimizer, ::MOI.SolverName) = "SimpleConicADMM"
+MOI.get(::Optimizer, ::MOI.SolverName) = "Zaphod"
 
 MOI.get(::Optimizer, ::MOI.SolverVersion) = "v0.1.0"
 
