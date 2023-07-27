@@ -1,11 +1,11 @@
-module TestSimpleConicADMM
+module TestZaphod
 
 using Test
 using JuMP
-import SimpleConicADMM
+import Zaphod
 
 function test_runtests()
-    optimizer = SimpleConicADMM.Optimizer()
+    optimizer = Zaphod.Optimizer()
     MOI.set(optimizer, MOI.RawOptimizerAttribute("max_iters"), 600)
     MOI.set(optimizer, MOI.Silent(), true) # comment this to enable output
     model = MOI.Bridges.full_bridge_optimizer(
@@ -49,4 +49,4 @@ end
 
 end  # module
 
-TestSimpleConicADMM.runtests()
+TestZaphod.runtests()

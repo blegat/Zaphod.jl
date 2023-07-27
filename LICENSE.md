@@ -1,4 +1,4 @@
-The SimpleConicADMM.jl package is licensed under the MIT "Expat" License:
+The Zaphod.jl package is licensed under the MIT "Expat" License:
 
 > Copyright (c) 2023: Benoît Legat, and contributors
 > 

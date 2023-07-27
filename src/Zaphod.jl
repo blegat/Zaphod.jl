@@ -1,4 +1,4 @@
-module SimpleConicADMM
+module Zaphod
 
 using LinearAlgebra, SparseArrays
 
