@@ -70,7 +70,7 @@ List of supported constraint types:
  * [`MOI.VectorAffineFunction{Float64}`](@ref) in [`MOI.DualExponentialCone`](@ref)
  * [`MOI.VectorAffineFunction{Float64}`](@ref) in [`MOI.PowerCone`](@ref)
  * [`MOI.VectorAffineFunction{Float64}`](@ref) in [`MOI.DualPowerCone`](@ref)
- * [`MOI.VectorAffineFunction{Float64}`](@ref) in [`MOI.ScaledPositiveSemidefiniteConeTriangle`](@ref)
+ * [`MOI.VectorAffineFunction{Float64}`](@ref) in [`MOI.Scaled{MOI.PositiveSemidefiniteConeTriangle}`](@ref)
 
 ## Options
 
