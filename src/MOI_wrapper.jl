@@ -1,7 +1,7 @@
 # We need the code to have an unscaled `MOI.Utilities.set_dot`.
 # So with `MOI.PositiveSemidefiniteConeTriangle`, the dual does not have `A'`,
-# we would need some scaling in addition # to just transposing `A`.
-# With `MOI.ScaledPositiveSemidefiniteConeTriangle`, we can just transpose.
+# we would need some scaling in addition to just transposing `A`.
+# With `MOI.Scaled{MOI.PositiveSemidefiniteConeTriangle}`, we can just transpose.
 
 const SUPPORTED_CONES = Union{
     MOI.Zeros,
@@ -11,6 +11,7 @@ const SUPPORTED_CONES = Union{
     MOI.DualExponentialCone,
     MOI.PowerCone,
     MOI.DualPowerCone,
+    MOI.Scaled{MOI.PositiveSemidefiniteConeTriangle},
 }
 
 MOI.Utilities.@product_of_sets(
@@ -22,6 +23,7 @@ MOI.Utilities.@product_of_sets(
     MOI.DualExponentialCone,
     MOI.PowerCone,
     MOI.DualPowerCone,
+    MOI.Scaled{MOI.PositiveSemidefiniteConeTriangle},
 )
 
 const OptimizerCache{T} = MOI.Utilities.GenericModel{
