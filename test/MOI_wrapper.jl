@@ -27,14 +27,7 @@ function test_runtests()
             MOI.ObjectiveBound,
         ],
     )
-    MOI.Test.runtests(
-        model,
-        config,
-        exclude = String[
-            "test_model_LowerBoundAlreadySet",
-            "test_model_UpperBoundAlreadySet",
-        ],
-    )
+    MOI.Test.runtests(model, config)
     return
 end
 
