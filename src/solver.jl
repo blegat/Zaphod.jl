@@ -93,9 +93,9 @@ function _project_cones(cones, u, w, cis, n)
         cone = _set(cones, ci)
         dual = MOI.dual_set(cone)
         rows = MOI.Utilities.rows(cones, ci)
-        u[n.+rows] = MathOptSetDistances.projection_on_set(
+        u[n .+ rows] = MathOptSetDistances.projection_on_set(
             MathOptSetDistances.DefaultDistance(),
-            w[n.+rows],
+            w[n .+ rows],
             dual,
         )
     end
