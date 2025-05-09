@@ -3,14 +3,14 @@
 # we would need some scaling in addition to just transposing `A`.
 # With `MOI.Scaled{MOI.PositiveSemidefiniteConeTriangle}`, we can just transpose.
 
-const SUPPORTED_CONES = Union{
+const SUPPORTED_CONES{T} = Union{
     MOI.Zeros,
     MOI.Nonnegatives,
     MOI.SecondOrderCone,
     MOI.ExponentialCone,
     MOI.DualExponentialCone,
-    MOI.PowerCone,
-    MOI.DualPowerCone,
+    MOI.PowerCone{T},
+    MOI.DualPowerCone{T},
     MOI.Scaled{MOI.PositiveSemidefiniteConeTriangle},
 }
 
@@ -21,8 +21,8 @@ MOI.Utilities.@product_of_sets(
     MOI.SecondOrderCone,
     MOI.ExponentialCone,
     MOI.DualExponentialCone,
-    MOI.PowerCone,
-    MOI.DualPowerCone,
+    MOI.PowerCone{T},
+    MOI.DualPowerCone{T},
     MOI.Scaled{MOI.PositiveSemidefiniteConeTriangle},
 )
 
