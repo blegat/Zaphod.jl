@@ -1,7 +1,7 @@
 # Zaphod.jl
 
-[![Build Status](https://github.com/blegat/Zaphod.jl/workflows/CI/badge.svg?branch=master)](https://github.com/blegat/Zaphod.jl/actions?query=workflow%3ACI)
-[![codecov](https://codecov.io/gh/blegat/Zaphod.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/blegat/Zaphod.jl)
+[![Build Status](https://github.com/blegat/Zaphod.jl/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/blegat/Zaphod.jl/actions?query=workflow%3ACI)
+[![codecov](https://codecov.io/gh/blegat/Zaphod.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/blegat/Zaphod.jl)
 
 [Zaphod.jl](https://github.com/blegat/Zaphod.jl) (**Z**aphod is an  **A**DMM/**P**roximal solver for the **Ho**mogeneous Self-**D**ual Embedding) is a simple implementation of an ADMM solver
 for conic programs interfacing with [MathOptInterface (MOI)](https://github.com/jump-dev/MathOptInterface.jl).
