@@ -258,9 +258,9 @@ function MOI.copy_to(dest::Optimizer{T}, src::OptimizerCache{T}) where {T}
 end
 
 function MOI.copy_to(
-    dest::Optimizer,
-    src::MOI.Utilities.UniversalFallback{OptimizerCache},
-)
+    dest::Optimizer{T},
+    src::MOI.Utilities.UniversalFallback{OptimizerCache{T}},
+) where {T}
     MOI.Utilities.throw_unsupported(src)
     return MOI.copy_to(dest, src.model)
 end
