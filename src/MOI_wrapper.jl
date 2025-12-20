@@ -147,6 +147,30 @@ function MOI.supports(
     return true
 end
 
+###
+### MOI.AbstractVariableAttribute
+###
+
+function MOI.supports(
+    ::Optimizer,
+    ::MOI.VariablePrimalStart,
+    ::Type{MOI.VariableIndex},
+)
+    return true
+end
+
+###
+### MOI.AbstractConstraintAttribute
+###
+
+function MOI.supports(
+    ::Optimizer,
+    ::Union{MOI.ConstraintPrimalStart,MOI.ConstraintDualStart},
+    ::Type{<:MOI.ConstraintIndex},
+)
+    return true
+end
+
 function MOI.supports_constraint(
     ::Optimizer{T},
     ::Type{MOI.VectorAffineFunction{T}},
